@@ -1,0 +1,19 @@
+<header class="header">implement a todo list</header>
+
+<main class="container">
+  <section class="todolist">
+    <header style="color: red" class="todolist-header">todolist</header>
+    <input
+      type="text"
+      class="todolist-input"
+      placeholder="Input your todo..."
+    />
+    <ul class="todolist-container">
+      <app-todo-item
+        *ngFor="let todo of todos"
+        [item]="todo"
+        (todoref)="deletetodo($event)"
+      ></app-todo-item>
+    </ul>
+  </section>
+</main>
