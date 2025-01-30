@@ -7,8 +7,16 @@
       type="text"
       class="todolist-input"
       placeholder="Input your todo..."
+      [(ngModel)]="inputTitle"
+      (keyup.enter)="handleKeyup($event)"
     />
-    <ul class="todolist-container">
+    <!-- {{ inputTodo.errors | json }} -->
+    <!-- <div *ngIf="inputTodo.dirty">
+      <div *ngIf="inputTodo.errors?.['required']">the input is required!</div>
+      <div *ngIf="inputTodo.errors?.['email']">should input email!</div>
+    </div> -->
+
+    <ul class="todolist-container" *ngIf="todos.length">
       <app-todo-item
         *ngFor="let todo of todos"
         [item]="todo"
@@ -16,4 +24,5 @@
       ></app-todo-item>
     </ul>
   </section>
+  <ng-content #name></ng-content>
 </main>

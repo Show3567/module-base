@@ -1,38 +1,57 @@
 import { Injectable } from '@angular/core';
-import { Todo } from './todo.interface';
+import { Todo, Comment } from './todo.interface';
+import { HttpClient } from '@angular/common/http';
+import {
+  BehaviorSubject,
+  catchError,
+  map,
+  Observable,
+  of,
+  retry,
+  Subject,
+  tap,
+} from 'rxjs';
 
 @Injectable()
 export class TodoService {
-  // val
-  todos: Todo[] = [
-    {
-      userId: 1,
-      id: 1,
-      title: 'delectus aut autem',
-      completed: false,
-    },
-    {
-      userId: 1,
-      id: 2,
-      title: 'quis ut nam facilis et officia qui',
-      completed: false,
-    },
-    {
-      userId: 1,
-      id: 3,
-      title: 'fugiat veniam minus',
-      completed: false,
-    },
-    {
-      userId: 1,
-      id: 4,
-      title: 'et porro tempora',
-      completed: true,
-    },
-  ];
+  baseUrl = 'https://jsonplaceholder.typicode.com';
+  todosPath = 'todos';
+  commentPath = 'comments';
+
+  todos$ = new BehaviorSubject<Todo[]>([]);
 
   // lifecycle
-  constructor() {}
+  constructor(private http: HttpClient) {}
 
   // methods
+  getTodos(): Observable<Todo[]> {
+    return this.http.get<Todo[]>(`${this.baseUrl}/${this.todosPath}`);
+  }
+  getComments(): Observable<Todo[]> {
+    return this.http.get<Comment[]>(`${this.baseUrl}/${this.commentPath}`).pipe(
+      map((comments: Comment[]) => {
+        return comments.map((comment: Comment) => {
+          return {
+            userId: comment.postId,
+            id: comment.id,
+            title: comment.body,
+            completed: false,
+          } as Todo;
+        });
+      }),
+      tap((todos) => {
+        this.todos$.next(todos);
+      }),
+      retry(3),
+      catchError((err) => of(err))
+    );
+  }
+
+  addTodo(todo: Todo) {
+    return this.http.post<Todo>(`${this.baseUrl}/${this.todosPath}`, todo).pipe(
+      tap((todo: Todo) => {
+        this.todos$.next([todo, ...this.todos$.value]);
+      })
+    );
+  }
 }

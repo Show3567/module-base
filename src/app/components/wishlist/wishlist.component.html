@@ -1,1 +1,4 @@
-<p>wishlist works!</p>
+<h1>this is wish list</h1>
+<ul class="todolist-container">
+  <app-todo-item *ngFor="let todo of todos" [item]="todo"></app-todo-item>
+</ul>
